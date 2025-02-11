@@ -1,0 +1,1 @@
+Test project based on DRF. Using interpreter python 3.11.9.
