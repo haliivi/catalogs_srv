@@ -55,18 +55,18 @@ class ElementCatalog(BaseModel):
     """Model of element catalog"""
 
     version_catalog = models.ForeignKey(VersionCatalog, verbose_name='Идентификатор версии справочника', on_delete=models.CASCADE)
-    code_element = models.CharField(verbose_name='Код элемента', max_length=100)
-    value_element = models.CharField(verbose_name='Значение элемента', max_length=300)
+    code = models.CharField(verbose_name='Код элемента', max_length=100)
+    value = models.CharField(verbose_name='Значение элемента', max_length=300)
 
     def __str__(self):
-        return self.code_element
+        return self.code
 
     class Meta:
         verbose_name = 'Элемент справочника'
         verbose_name_plural = 'Элементы справочника'
         constraints = [
             models.UniqueConstraint(
-                fields=['version_catalog', 'code_element'],
+                fields=['version_catalog', 'code'],
                 name='unique_element_code_per_by_version'
             )
         ]
