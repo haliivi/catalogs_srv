@@ -16,7 +16,7 @@ class BaseModel(models.Model):
 class Catalog(BaseModel):
     """Model of catalog"""
 
-    code = models.CharField(verbose_name='Код', max_length=100)
+    code = models.CharField(verbose_name='Код', max_length=100, unique=True)
     name = models.CharField(verbose_name='Наименование', max_length=300)
     description = models.TextField(verbose_name='Описание', blank=True, null=True)
 
@@ -32,7 +32,7 @@ class VersionCatalog(BaseModel):
 
     catalog = models.ForeignKey(Catalog, verbose_name='Идентификатор справочника', on_delete=models.CASCADE)
     version = models.CharField(verbose_name='Версия', max_length=50)
-    data_start_actual = models.DateField(verbose_name='Дата начала действия версии', blank=True, null=True)
+    date_start_actual = models.DateField(verbose_name='Дата начала действия версии', blank=True, null=True)
 
     def __str__(self):
         return self.version
@@ -40,6 +40,16 @@ class VersionCatalog(BaseModel):
     class Meta:
         verbose_name = 'Версия справочника'
         verbose_name_plural = 'Версии справочника'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['catalog', 'version'],
+                name='unique_version_by_catalog'
+            ),
+            models.UniqueConstraint(
+                fields=['catalog', 'date_start_actual'],
+                name='unique_start_date_by_catalog',
+            ),
+        ]
 
 class ElementCatalog(BaseModel):
     """Model of element catalog"""
@@ -54,3 +64,9 @@ class ElementCatalog(BaseModel):
     class Meta:
         verbose_name = 'Элемент справочника'
         verbose_name_plural = 'Элементы справочника'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['version_catalog', 'code_element'],
+                name='unique_element_code_per_by_version'
+            )
+        ]
