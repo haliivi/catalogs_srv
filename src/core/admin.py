@@ -1,3 +1,17 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+@admin.register(Catalog)
+class CatalogAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(VersionCatalog)
+class VersionCatalogAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ElementCatalog)
+class ElementCatalogAdmin(admin.ModelAdmin):
+    pass
