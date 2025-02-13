@@ -31,7 +31,6 @@ class CatalogViewSet(BaseViewSet):
             except ValueError:
                 raise ValidationError({'error': "Не верный формат даты. Ожидаемый формат: YYYY-MM-DD."})
             queryset_last_version = VersionCatalog.objects.filter(
-                catalog=OuterRef('pk'),
                 date_start_actual__lte=date
             ).order_by('-date_start_actual').values('pk')[:1]
             queryset = queryset.filter(versioncatalog__id=Subquery(queryset_last_version))
@@ -48,10 +47,19 @@ class ElementCatalogViewSet(BaseViewSet):
         catalog_id = self.kwargs.get('id_')
         catalog = get_object_or_404(Catalog, id=catalog_id)
         version_param = self.request.query_params.get('version')
-        queryset = ElementCatalog.objects.filter(
-            version_catalog__catalog=catalog,
-            version_catalog__version=version_param
-        )
+        queryset = ElementCatalog.objects.all()
+        if version_param:
+            queryset = queryset.filter(
+                version_catalog__catalog=catalog,
+                version_catalog__version=version_param
+            )
+        else:
+            date = datetime.datetime.now()
+            queryset_last_version = VersionCatalog.objects.filter(
+                catalog=catalog,
+                date_start_actual__lte=date
+            ).order_by('-date_start_actual').values('pk')[:1]
+            queryset = queryset.filter(version_catalog__id=Subquery(queryset_last_version))
         return queryset
 
     def list(self, request, *args, **kwargs):
