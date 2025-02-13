@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "0ec17bc7-ebc1-4ade-ac8c-f2dcf6b8085c",
+		"name": "catalogs_srv",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29828395"
+	},
+	"item": [
+		{
+			"name": "catalog",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/refbooks?date=2025-10-01",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"refbooks"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2025-10-01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "element",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/refbooks/e70219a5-2e73-4f86-9931-560686427e55/elements/?version=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"refbooks",
+						"e70219a5-2e73-4f86-9931-560686427e55",
+						"elements",
+						""
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "check_element",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/refbooks/e70219a5-2e73-4f86-9931-560686427e55/check-element/?code=s13&value=Значение 2&version=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"refbooks",
+						"e70219a5-2e73-4f86-9931-560686427e55",
+						"check-element",
+						""
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "s13"
+						},
+						{
+							"key": "value",
+							"value": "Значение 2"
+						},
+						{
+							"key": "version",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
