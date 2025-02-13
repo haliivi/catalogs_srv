@@ -1,6 +1,8 @@
 import datetime
 from django.db.models import Subquery
 from django.shortcuts import get_object_or_404
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, viewsets, response
 from rest_framework.exceptions import ValidationError
 from .models import *
@@ -40,6 +42,13 @@ class CatalogViewSet(BaseViewSet):
             queryset = queryset.filter(versioncatalog__in=Subquery(queryset_last_versions))
         return queryset
 
+    @swagger_auto_schema(
+        operation_description='Получение списка справочников',
+        manual_parameters=[
+            openapi.Parameter(name='date', schema=openapi.IN_QUERY, description='Фильтр по дате', type=openapi.TYPE_STRING)
+        ],
+        responses={200: CatalogSerializer(many=True)}
+    )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, root_key='refbooks', **kwargs)
 
@@ -62,6 +71,13 @@ class ElementCatalogViewSet(BaseViewSet):
             queryset = queryset.filter(version_catalog=Subquery(last_version_catalog))
         return queryset
 
+    @swagger_auto_schema(
+        operation_description='Получение элементов заданного справочника',
+        manual_parameters=[
+            openapi.Parameter(name='version', schema=openapi.IN_QUERY, description='Фильтр по версии', type=openapi.TYPE_STRING)
+        ],
+        responses={200: ElementCatalogSerializer(many=True)}
+    )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, root_key='elements', **kwargs)
 
@@ -78,6 +94,18 @@ class CheckElementViewSet(viewsets.ModelViewSet):
             last_version_catalog = get_last_version_catalog(catalog=catalog)
             return ElementCatalog.objects.filter(code=code, value=value, version_catalog=last_version_catalog)
 
+    @swagger_auto_schema(
+        operation_description='Валидация элемента справочника',
+        manual_parameters=[
+            openapi.Parameter(name='code',schema=openapi.IN_QUERY, description='Код элемента', type=openapi.TYPE_STRING),
+            openapi.Parameter(name='value', schema=openapi.IN_QUERY, description='Значение элемента', type=openapi.TYPE_STRING),
+            openapi.Parameter(name='version', schema=openapi.IN_QUERY, description='Версия справочника', type=openapi.TYPE_STRING)
+        ],
+        responses={200: openapi.Response(description='Проверка есть ли такой элемент', schema=openapi.Schema(type=openapi.TYPE_OBJECT, properties={
+            'valid': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+            'message': openapi.Schema(type=openapi.TYPE_STRING)
+        }))}
+    )
     def check_element(self, *args, **kwargs):
         is_exists = self.get_queryset().exists()
         return response.Response(
