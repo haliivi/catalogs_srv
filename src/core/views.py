@@ -14,6 +14,7 @@ __all__ = ['CatalogViewSet', 'ElementCatalogViewSet', 'CheckElementViewSet']
 
 class BaseViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ['get']
 
     def list(self, request, *args, **kwargs):
         root_key = kwargs.get('root_key')
