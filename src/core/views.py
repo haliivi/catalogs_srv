@@ -35,7 +35,7 @@ class CatalogViewSet(BaseViewSet):
         return super().list(request, *args, root_key='refbooks', **kwargs)
 
 
-class ElementCatalogViewSet(viewsets.ModelViewSet):
+class ElementCatalogViewSet(BaseViewSet):
     serializer_class = ElementCatalogSerializer
 
     def get_queryset(self, *args, **kwargs):
@@ -57,18 +57,16 @@ class CheckElementViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         catalog_id = self.kwargs.get('id_')
         catalog = get_object_or_404(Catalog, id=catalog_id)
-        code, value = map(lambda key: self.request.query_params.get(key), ('code', 'value'))
-        return ElementCatalog.objects.filter(code=code, value=value, version_catalog__catalog=catalog)
+        code, value, version = map(lambda key: self.request.query_params.get(key), ('code', 'value', 'version'))
+        return ElementCatalog.objects.filter(code=code, value=value, version_catalog__catalog=catalog, version_catalog__version=version)
 
     def check_element(self, *args, **kwargs):
-        queryset = self.get_queryset()
+        is_exists = self.get_queryset().exists()
         return response.Response(
             {
-                'valid': True,
-                'message': "Элемент с такими параметрами существует в справочнике."
-            } if queryset else
-            {
-                'valid': False,
-                'message': 'Элемент с такими параметрами не существует в справочнике.'
+                'valid': is_exists,
+                'message': 'Элемент с такими параметрами существует в справочнике.'
+                if is_exists else
+                'Элемент с такими параметрами не существует в справочнике.'
             }
         )
