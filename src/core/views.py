@@ -39,7 +39,7 @@ class CatalogViewSet(BaseViewSet):
             queryset_last_versions = VersionCatalog.objects.filter(
                 date_start_actual__lte=date
             ).order_by('-date_start_actual').values('pk')
-            queryset = queryset.filter(versioncatalog__in=Subquery(queryset_last_versions))
+            queryset = queryset.filter(versioncatalog__in=Subquery(queryset_last_versions)).distinct()
         return queryset
 
     @swagger_auto_schema(
