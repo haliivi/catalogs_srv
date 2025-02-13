@@ -14,7 +14,7 @@ class BaseModel(models.Model):
         abstract = True
 
 class Catalog(BaseModel):
-    """Model of catalog"""
+    """Модель справочников"""
 
     code = models.CharField(verbose_name='Код', max_length=100, unique=True)
     name = models.CharField(verbose_name='Наименование', max_length=300)
@@ -28,7 +28,7 @@ class Catalog(BaseModel):
         verbose_name_plural = 'Справочники'
 
 class VersionCatalog(BaseModel):
-    """Model of version catalog"""
+    """Модель версий справочников"""
 
     catalog = models.ForeignKey(Catalog, verbose_name='Идентификатор справочника', on_delete=models.CASCADE)
     version = models.CharField(verbose_name='Версия', max_length=50)
@@ -52,7 +52,7 @@ class VersionCatalog(BaseModel):
         ]
 
 class ElementCatalog(BaseModel):
-    """Model of element catalog"""
+    """Модель элементов справочника"""
 
     version_catalog = models.ForeignKey(VersionCatalog, verbose_name='Идентификатор версии справочника', on_delete=models.CASCADE)
     code = models.CharField(verbose_name='Код элемента', max_length=100)

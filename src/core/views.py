@@ -1,7 +1,9 @@
+import datetime
 from django.db.models import OuterRef, Subquery
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, viewsets, response
-from .models import Catalog, VersionCatalog, ElementCatalog
+from rest_framework.exceptions import ValidationError
+from .models import *
 from .serializers import *
 
 __all__ = ['CatalogViewSet', 'ElementCatalogViewSet', 'CheckElementViewSet']
@@ -24,6 +26,10 @@ class CatalogViewSet(BaseViewSet):
         queryset = Catalog.objects.all()
         date = self.request.query_params.get('date')
         if date:
+            try:
+                date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            except ValueError:
+                raise ValidationError({'error': "Не верный формат даты. Ожидаемый формат: YYYY-MM-DD."})
             queryset_last_version = VersionCatalog.objects.filter(
                 catalog=OuterRef('pk'),
                 date_start_actual__lte=date
