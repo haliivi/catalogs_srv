@@ -45,7 +45,7 @@ class CatalogViewSet(BaseViewSet):
     @swagger_auto_schema(
         operation_description='Получение списка справочников',
         manual_parameters=[
-            openapi.Parameter(name='date', schema=openapi.IN_QUERY, description='Фильтр по дате', type=openapi.TYPE_STRING)
+            openapi.Parameter(name='date', in_=openapi.IN_QUERY, description='Фильтр по дате', type=openapi.TYPE_STRING)
         ],
         responses={200: CatalogSerializer(many=True)}
     )
@@ -74,7 +74,7 @@ class ElementCatalogViewSet(BaseViewSet):
     @swagger_auto_schema(
         operation_description='Получение элементов заданного справочника',
         manual_parameters=[
-            openapi.Parameter(name='version', schema=openapi.IN_QUERY, description='Фильтр по версии', type=openapi.TYPE_STRING)
+            openapi.Parameter(name='version', in_=openapi.IN_QUERY, description='Фильтр по версии', type=openapi.TYPE_STRING)
         ],
         responses={200: ElementCatalogSerializer(many=True)}
     )
@@ -97,9 +97,9 @@ class CheckElementViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description='Валидация элемента справочника',
         manual_parameters=[
-            openapi.Parameter(name='code',schema=openapi.IN_QUERY, description='Код элемента', type=openapi.TYPE_STRING),
-            openapi.Parameter(name='value', schema=openapi.IN_QUERY, description='Значение элемента', type=openapi.TYPE_STRING),
-            openapi.Parameter(name='version', schema=openapi.IN_QUERY, description='Версия справочника', type=openapi.TYPE_STRING)
+            openapi.Parameter(name='code', in_=openapi.IN_QUERY, description='Код элемента', type=openapi.TYPE_STRING),
+            openapi.Parameter(name='value', in_=openapi.IN_QUERY, description='Значение элемента', type=openapi.TYPE_STRING),
+            openapi.Parameter(name='version', in_=openapi.IN_QUERY, description='Версия справочника', type=openapi.TYPE_STRING)
         ],
         responses={200: openapi.Response(description='Проверка есть ли такой элемент', schema=openapi.Schema(type=openapi.TYPE_OBJECT, properties={
             'valid': openapi.Schema(type=openapi.TYPE_BOOLEAN),
