@@ -1,12 +1,15 @@
 import datetime
-from django.db.models import OuterRef, Subquery
+from django.db.models import Subquery
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, viewsets, response
 from rest_framework.exceptions import ValidationError
 from .models import *
 from .serializers import *
+from .utils import get_last_version_catalog
+
 
 __all__ = ['CatalogViewSet', 'ElementCatalogViewSet', 'CheckElementViewSet']
+
 
 
 class BaseViewSet(viewsets.ModelViewSet):
@@ -30,10 +33,10 @@ class CatalogViewSet(BaseViewSet):
                 date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
             except ValueError:
                 raise ValidationError({'error': "Не верный формат даты. Ожидаемый формат: YYYY-MM-DD."})
-            queryset_last_version = VersionCatalog.objects.filter(
+            queryset_last_versions = VersionCatalog.objects.filter(
                 date_start_actual__lte=date
-            ).order_by('-date_start_actual').values('pk')[:1]
-            queryset = queryset.filter(versioncatalog__id=Subquery(queryset_last_version))
+            ).order_by('-date_start_actual').values('pk')
+            queryset = queryset.filter(versioncatalog__in=Subquery(queryset_last_versions))
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -54,12 +57,8 @@ class ElementCatalogViewSet(BaseViewSet):
                 version_catalog__version=version_param
             )
         else:
-            date = datetime.datetime.now()
-            queryset_last_version = VersionCatalog.objects.filter(
-                catalog=catalog,
-                date_start_actual__lte=date
-            ).order_by('-date_start_actual').values('pk')[:1]
-            queryset = queryset.filter(version_catalog__id=Subquery(queryset_last_version))
+            last_version_catalog = get_last_version_catalog(catalog=catalog)
+            queryset = queryset.filter(version_catalog=Subquery(last_version_catalog))
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -72,7 +71,11 @@ class CheckElementViewSet(viewsets.ModelViewSet):
         catalog_id = self.kwargs.get('id_')
         catalog = get_object_or_404(Catalog, id=catalog_id)
         code, value, version = map(lambda key: self.request.query_params.get(key), ('code', 'value', 'version'))
-        return ElementCatalog.objects.filter(code=code, value=value, version_catalog__catalog=catalog, version_catalog__version=version)
+        if version:
+            return ElementCatalog.objects.filter(code=code, value=value, version_catalog__catalog=catalog, version_catalog__version=version)
+        else:
+            last_version_catalog = get_last_version_catalog(catalog=catalog)
+            return ElementCatalog.objects.filter(code=code, value=value, version_catalog=last_version_catalog)
 
     def check_element(self, *args, **kwargs):
         is_exists = self.get_queryset().exists()
